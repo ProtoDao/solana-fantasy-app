@@ -27,9 +27,16 @@ export function CreateLeague() {
       throw new Error('leagueSize value is NaN');
     }
 
-    const resp = await window.wallet.callback('Sign on Create League transaction?', (acc) => {
-      return sdk.createLeague(acc, leagueNameInput, bid * 10 ** 9, leagueSize, teamNameInput);
-    });
+    // const resp = await window.wallet.callback('Sign on Create League transaction?', (acc) => {
+    //   return sdk.createLeague(acc, leagueNameInput, bid * 10 ** 9, leagueSize, teamNameInput);
+    // });
+    const resp = await sdk.createLeague(
+      window.wallet,
+      leagueNameInput,
+      bid * 10 ** 9,
+      leagueSize,
+      teamNameInput
+    );
 
     console.log({ resp });
   };

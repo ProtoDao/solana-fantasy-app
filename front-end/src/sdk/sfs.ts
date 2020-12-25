@@ -15,6 +15,7 @@ import {
 } from './state';
 import { SfsInstruction, Player as PlayerInit } from './instruction';
 import { u64 } from './util/layout';
+import { ClojuredWallet } from '../clojured-wallet';
 
 // The address of the special mint for wrapped native token.
 export const NATIVE_MINT: PublicKey = new PublicKey('So11111111111111111111111111111111111111112');
@@ -160,7 +161,7 @@ export class SFS {
    * @return Index of the created league
    */
   async createLeague(
-    owner: Account,
+    owner: ClojuredWallet,
     name: string,
     bid: number | u64,
     usersLimit: number,
@@ -183,7 +184,8 @@ export class SFS {
     if (rootInfo === null) {
       throw new Error('Failed to find root account');
     }
-    await sendAndConfirmTransaction('Create league', this.connection, transaction, owner);
+    // await sendAndConfirmTransaction('Create league', this.connection, transaction, owner);
+    await owner.sendAndConfirmTx('Sign on Create League tx?', transaction);
 
     const root = await this.getRootInfo();
     for (let i = root.leaguesCount; i >= 0; i--) {
@@ -202,7 +204,7 @@ export class SFS {
    * @param teamName A name of current user's team
    * @return Public key of the new empty account
    */
-  async joinLeague(owner: Account, leagueIndex: number, teamName: string): Promise<void> {
+  async joinLeague(owner: ClojuredWallet, leagueIndex: number, teamName: string): Promise<void> {
     const transaction = new Transaction();
     transaction.add(
       SfsInstruction.createJoinLeagueInstruction(
@@ -215,7 +217,8 @@ export class SFS {
       )
     );
 
-    await sendAndConfirmTransaction('Join league', this.connection, transaction, owner);
+    // await sendAndConfirmTransaction('Join league', this.connection, transaction, owner);
+    await owner.sendAndConfirmTx('Sign on Join League tx?', transaction);
   }
 
   /**
@@ -227,7 +230,7 @@ export class SFS {
    * @param playerId A 1-based id of player to pick
    */
   async pickPlayer(
-    owner: Account,
+    owner: ClojuredWallet,
     leagueIndex: number,
     userId: number,
     playerId: number
@@ -244,7 +247,8 @@ export class SFS {
       )
     );
 
-    await sendAndConfirmTransaction('Pick player', this.connection, transaction, owner);
+    // await sendAndConfirmTransaction('Pick player', this.connection, transaction, owner);
+    await owner.sendAndConfirmTx('Sign on Pick Player tx?', transaction);
   }
   /**
    * Update lineup for the next and further weeks.
@@ -256,7 +260,7 @@ export class SFS {
    * @param activePlayers List of players to be active in next week
    */
   async updateLineup(
-    owner: Account,
+    owner: ClojuredWallet,
     leagueIndex: number,
     userId: number,
     week: number,
@@ -275,7 +279,8 @@ export class SFS {
       )
     );
 
-    await sendAndConfirmTransaction('Update lineup', this.connection, transaction, owner);
+    // await sendAndConfirmTransaction('Update lineup', this.connection, transaction, owner);
+    await owner.sendAndConfirmTx('Sign on Update Lineup tx?', transaction);
   }
   /**
    * Propose a player swap.
@@ -289,7 +294,7 @@ export class SFS {
    * @param wantPlayerId A 1-based id of player accepting user gives
    */
   async proposeSwap(
-    owner: Account,
+    owner: ClojuredWallet,
     leagueIndex: number,
     proposingUserId: number,
     acceptingUserId: number,
@@ -310,7 +315,8 @@ export class SFS {
       )
     );
 
-    await sendAndConfirmTransaction('Propose swap', this.connection, transaction, owner);
+    // await sendAndConfirmTransaction('Propose swap', this.connection, transaction, owner);
+    await owner.sendAndConfirmTx('Sign on Propose Swap tx?', transaction);
   }
   /**
    * Accept a player swap proposal.
@@ -323,7 +329,7 @@ export class SFS {
    * @param givePlayerId A 1-based id of player accepting user gives
    */
   async acceptSwap(
-    owner: Account,
+    owner: ClojuredWallet,
     leagueIndex: number,
     acceptingUserId: number,
     proposingUserId: number,
@@ -344,7 +350,8 @@ export class SFS {
       )
     );
 
-    await sendAndConfirmTransaction('Accept swap', this.connection, transaction, owner);
+    // await sendAndConfirmTransaction('Accept swap', this.connection, transaction, owner);
+    await owner.sendAndConfirmTx('Sign on Accept Swap tx?', transaction);
   }
   /**
    * Reject a player swap proposal.
@@ -357,7 +364,7 @@ export class SFS {
    * @param givePlayerId A 1-based id of player accepting user gives
    */
   async rejectSwap(
-    owner: Account,
+    owner: ClojuredWallet,
     leagueIndex: number,
     acceptingUserId: number,
     proposingUserId: number,
@@ -378,7 +385,8 @@ export class SFS {
       )
     );
 
-    await sendAndConfirmTransaction('Reject swap', this.connection, transaction, owner);
+    // await sendAndConfirmTransaction('Reject swap', this.connection, transaction, owner);
+    await owner.sendAndConfirmTx('Sign on Reject Swap tx?', transaction);
   }
 
   /**
@@ -469,7 +477,7 @@ export class SFS {
    * @param scores Array of players and their scores
    */
   async updatePlayerScores(
-    owner: Account,
+    owner: ClojuredWallet,
     scores: { playerId: number; playerScore: number }[]
   ): Promise<void> {
     for (let i = 0; i < scores.length / MAX_PLAYERS_SCORES_PER_TRANSACTION; i++) {
@@ -494,14 +502,24 @@ export class SFS {
             )
           );
         });
-      await sendAndConfirmTransaction(
-        `Uploading scores ${i * MAX_PLAYERS_SCORES_PER_TRANSACTION} of ${Math.min(
+      // await sendAndConfirmTransaction(
+      //   `Uploading scores ${i * MAX_PLAYERS_SCORES_PER_TRANSACTION} of ${Math.min(
+      //     scores.length - 1,
+      //     (i + 1) * MAX_PLAYERS_SCORES_PER_TRANSACTION
+      //   )}`,
+      //   this.connection,
+      //   transaction,
+      //   owner
+      // );
+
+      await owner.sendAndConfirmTx(
+        `Sign on Update Scores ${
+          i * MAX_PLAYERS_SCORES_PER_TRANSACTION
+        } of ${Math.min(
           scores.length - 1,
           (i + 1) * MAX_PLAYERS_SCORES_PER_TRANSACTION
-        )}`,
-        this.connection,
-        transaction,
-        owner
+        )} transaction?`,
+        transaction
       );
     }
   }
@@ -511,7 +529,7 @@ export class SFS {
    *
    * @param owner An oracle's account
    */
-  async incrementWeek(owner: Account): Promise<void> {
+  async incrementWeek(owner: ClojuredWallet): Promise<void> {
     const transaction = new Transaction();
     transaction.add(
       SfsInstruction.createIncrementWeekInstruction(
@@ -522,7 +540,8 @@ export class SFS {
       )
     );
 
-    await sendAndConfirmTransaction('Increment week', this.connection, transaction, owner);
+    // await sendAndConfirmTransaction('Increment week', this.connection, transaction, owner);
+    await owner.sendAndConfirmTx('Sign on Increment Week tx?', transaction);
   }
 
   /**
@@ -532,7 +551,11 @@ export class SFS {
    * @param winners Array of the winners
    * @param sender Account to pay the transaction fee
    */
-  async claimReward(leagueIndex: number, winners: PublicKey[], sender: Account): Promise<void> {
+  async claimReward(
+    leagueIndex: number,
+    winners: PublicKey[],
+    sender: ClojuredWallet
+  ): Promise<void> {
     const transaction = new Transaction();
     transaction.add(
       SfsInstruction.createClaimRewardInstruction(
@@ -544,6 +567,7 @@ export class SFS {
       )
     );
 
-    await sendAndConfirmTransaction('Claim reward', this.connection, transaction, sender);
+    // await sendAndConfirmTransaction('Claim reward', this.connection, transaction, sender);
+    await sender.sendAndConfirmTx('Sign on Claim Reward tx?', transaction);
   }
 }

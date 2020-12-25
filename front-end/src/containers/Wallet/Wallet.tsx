@@ -9,7 +9,7 @@ export const Wallet: FunctionComponent<{}> = (props) => {
 
   const updateBalance = async () => {
     if (window.wallet) {
-      const balance = await window.connection.getBalance(new PublicKey(window.wallet.publicKey));
+      const balance = await window.connection.getBalance(window.wallet.publicKey);
       setBalance(balance);
     }
   };
@@ -64,7 +64,7 @@ export const Wallet: FunctionComponent<{}> = (props) => {
           {window.wallet ? (
             <>
               <p>
-                Public Key: <span className="monospace">{window.wallet?.publicKey}</span>
+                Public Key: <span className="monospace">{window.wallet?.publicKey.toBase58()}</span>
               </p>
               <p>
                 Private Key:{' '}
@@ -92,7 +92,7 @@ export const Wallet: FunctionComponent<{}> = (props) => {
                       onClick={async () => {
                         setAirdropSpinner(true);
                         if (window.wallet) {
-                          const pub = new PublicKey(window.wallet.publicKey);
+                          const pub = window.wallet.publicKey;
                           await window.connection.requestAirdrop(pub, 1 * 10 ** 9);
                           await new Promise((res) => setTimeout(res, 1000));
                           await updateBalance();

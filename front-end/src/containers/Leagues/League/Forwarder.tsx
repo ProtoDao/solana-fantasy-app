@@ -17,7 +17,7 @@ export const Forwarder: FunctionComponent<RouteComponentProps<MatchParams>> = (p
   useEffect(() => {
     (async () => {
       if (window.wallet) {
-        const isJoined = await isUserAlreadyJoined(window.wallet.publicKey, leagueIndex);
+        const isJoined = await isUserAlreadyJoined(window.wallet.publicKey.toBase58(), leagueIndex);
         if (!isJoined) {
           history.replace(`/leagues/${leagueIndex}/join`);
           window.leagueTabHook();

@@ -130,13 +130,12 @@ export const Scoreboard: FunctionComponent<RouteComponentProps<MatchParams>> = (
       throw new Error('Winners is null');
     }
     const sdk = await window.sfsSDK();
-    const resp = await window.wallet.callback('Sign on Claim Reward transaction?', async (acc) => {
-      await sdk.claimReward(
-        leagueIndex,
-        winners.map((x) => x.userState.pubKey),
-        acc
-      );
-    });
+    const resp = await sdk.claimReward(
+      leagueIndex,
+      winners.map((x) => x.userState.pubKey),
+      window.wallet
+    );
+
     console.log({ resp });
   };
 

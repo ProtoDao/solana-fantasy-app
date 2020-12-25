@@ -77,14 +77,15 @@ export function Admin() {
 
       await wait(1500);
 
-      await window.wallet.callback('Sign on Increment Week transaction?', (acc) => {
-        pushLine({
-          text: 'Signing on transaction and submitting...',
-          color: 'white',
-        });
-        return sdk.incrementWeek(acc);
-        // return wait(1500);
+      // await window.wallet.callback('Sign on Increment Week transaction?', (acc) => {
+      //   // return wait(1500);
+      // });
+      pushLine({
+        text: 'Signing on transaction and submitting...',
+        color: 'white',
       });
+      await sdk.incrementWeek(window.wallet);
+
       pushLine({
         text: 'Increment week tx was submitted!',
         color: 'lightgreen',
@@ -146,14 +147,13 @@ export function Admin() {
         color: 'white',
       });
       await wait(1500);
-      await window.wallet.callback('Sign on Update Player Scores transaction?', (acc) => {
-        pushLine({
-          text: 'Signing on transaction and submitting...',
-          color: 'white',
-        });
-        return sdk.updatePlayerScores(acc, scores);
-        // return wait(1500);
+
+      pushLine({
+        text: 'Signing on transaction and submitting...',
+        color: 'white',
       });
+      await sdk.updatePlayerScores(window.wallet, scores);
+
       pushLine({
         text: 'Update Player Scores tx was submitted!',
         color: 'lightgreen',

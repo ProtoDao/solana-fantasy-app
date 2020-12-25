@@ -59,7 +59,9 @@ export const LeagueRow: FunctionComponent<{ league: League; leagueIndex: number 
   useEffect(() => {
     (async () => {
       if (window.wallet) {
-        setIsAlreadyJoined(await isUserAlreadyJoined(window.wallet.publicKey, props.leagueIndex));
+        setIsAlreadyJoined(
+          await isUserAlreadyJoined(window.wallet.publicKey.toBase58(), props.leagueIndex)
+        );
       }
     })().catch(console.error);
   }, []);

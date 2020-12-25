@@ -19,7 +19,10 @@ export const JoinLeague: FunctionComponent<RouteComponentProps<MatchParams>> = (
   useEffect(() => {
     (async () => {
       if (window.wallet) {
-        const _isJoined = await isUserAlreadyJoined(window.wallet.publicKey, leagueIndex);
+        const _isJoined = await isUserAlreadyJoined(
+          window.wallet.publicKey.toBase58(),
+          leagueIndex
+        );
         setIsJoined(_isJoined);
       }
     })().catch(console.error);
@@ -40,9 +43,7 @@ export const JoinLeague: FunctionComponent<RouteComponentProps<MatchParams>> = (
     }
     const sdk = await window.sfsSDK();
 
-    const resp = await window.wallet.callback('Sign on Create League transaction?', async (acc) => {
-      await sdk.joinLeague(acc, leagueIndex, teamNameInput);
-    });
+    const resp = await sdk.joinLeague(window.wallet, leagueIndex, teamNameInput);
     console.log({ resp });
   };
 

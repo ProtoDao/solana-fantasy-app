@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { Layout } from '../Layout';
 
 import { hexlify, isHexString } from '@ethersproject/bytes';
-import { CreateClojuredWallet } from '../../clojured-wallet';
+import { PrivateKeyWallet, SolletWallet } from '../../clojured-wallet';
 
 export const ImportWallet: FunctionComponent<{}> = (props) => {
   let [privateKeyInput, setPrivateKeyInput] = useState<string>('');
@@ -16,18 +16,18 @@ export const ImportWallet: FunctionComponent<{}> = (props) => {
         message: 'Please wait importing wallet...',
         variant: 'warning',
       });
-      const wallet = CreateClojuredWallet(privateKeyInput);
+      const wallet = new PrivateKeyWallet(privateKeyInput, window.connection);
       window.wallet = wallet;
-      try {
-        window.wallet.callback(
-          'Wallet Imported! Do you want to locally cache your wallet?',
-          (acc) => {
-            try {
-              localStorage.setItem('sfs-secret', hexlify(acc.secretKey));
-            } catch {}
-          }
-        );
-      } catch {}
+      // try {
+      //   window.wallet.callback(
+      //     'Wallet Imported! Do you want to locally cache your wallet?',
+      //     (acc) => {
+      //       try {
+      //         localStorage.setItem('sfs-secret', hexlify(acc.secretKey));
+      //       } catch {}
+      //     }
+      //   );
+      // } catch {}
       setDisplay({
         message: 'Wallet imported successfully!',
         variant: 'success',
