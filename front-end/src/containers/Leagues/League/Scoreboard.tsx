@@ -173,6 +173,7 @@ export const Scoreboard: FunctionComponent<RouteComponentProps<MatchParams>> = (
                       <br />
                       Prize:{' '}
                       {(root.leagues[leagueIndex].usersLimit *
+                        // @ts-ignore
                         root.leagues[leagueIndex].bid.toNumber()) /
                         10 ** 9}{' '}
                       SOL

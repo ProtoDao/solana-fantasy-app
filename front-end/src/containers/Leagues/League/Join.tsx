@@ -28,6 +28,7 @@ export const JoinLeague: FunctionComponent<RouteComponentProps<MatchParams>> = (
   useEffect(() => {
     (async () => {
       const root = await window.getCachedRootInfo();
+      /** @ts-ignore */
       setFeesInput(String(root.leagues[leagueIndex].bid.toNumber() / 10 ** 9));
       setLeagueName(root.leagues[leagueIndex].name);
     })().catch(console.error);
