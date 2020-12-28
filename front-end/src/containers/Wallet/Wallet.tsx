@@ -46,6 +46,7 @@ export const Wallet: FunctionComponent<{}> = (props) => {
         const privateKey = window.wallet.privateKey;
         setPrivateKeyDisplay(privateKey);
       } catch (err) {
+        alert(err.message);
         console.error(err);
       }
     }

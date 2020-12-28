@@ -86,9 +86,8 @@ export class SolletWallet implements ClojuredWallet {
     this._wallet.connect();
   }
 
-  get privateKey() {
-    alert('Private key is locked inside Sollet, cannot export');
-    return 'Not supported';
+  get privateKey(): string {
+    throw new Error('Private key is locked inside Sollet, cannot export');
   }
 
   async sendAndConfirmTx(description: string, transaction: Transaction) {
