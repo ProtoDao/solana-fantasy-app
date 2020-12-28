@@ -513,9 +513,7 @@ export class SFS {
       // );
 
       await owner.sendAndConfirmTx(
-        `Sign on Update Scores ${
-          i * MAX_PLAYERS_SCORES_PER_TRANSACTION
-        } of ${Math.min(
+        `Sign on Update Scores ${i * MAX_PLAYERS_SCORES_PER_TRANSACTION} of ${Math.min(
           scores.length - 1,
           (i + 1) * MAX_PLAYERS_SCORES_PER_TRANSACTION
         )} transaction?`,
