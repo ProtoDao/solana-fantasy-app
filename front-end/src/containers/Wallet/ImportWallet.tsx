@@ -9,9 +9,12 @@ import { PrivateKeyWallet, SolletWallet } from '../../clojured-wallet';
 export const ImportWallet: FunctionComponent<{}> = (props) => {
   let [privateKeyInput, setPrivateKeyInput] = useState<string>('');
   let [display, setDisplay] = useState<{ message: string; variant: string } | null>(null);
+  let [activeWallet, setActiveWallet] = useState<'sollet' | 'privatekey'>();
+  let [currentScreen, setCurrentScreen] = useState<number>(0);
 
   const importWallet = async (isPrivateKey: boolean) => {
     try {
+      setActiveWallet(isPrivateKey ? 'privatekey' : 'sollet');
       setDisplay({
         message: 'Please wait importing wallet...',
         variant: 'warning',
@@ -27,6 +30,7 @@ export const ImportWallet: FunctionComponent<{}> = (props) => {
         message: 'Wallet imported successfully!',
         variant: 'success',
       });
+      setCurrentScreen(1);
 
       Object.entries(window.walletStatusChangeHooks).forEach((entries) => {
         try {
@@ -38,6 +42,7 @@ export const ImportWallet: FunctionComponent<{}> = (props) => {
         message: `Error: ${error.message}`,
         variant: 'danger',
       });
+      setCurrentScreen(0);
     }
   };
 
@@ -45,45 +50,61 @@ export const ImportWallet: FunctionComponent<{}> = (props) => {
     <Layout heading="Import Wallet">
       <Card style={{ maxWidth: '400px', margin: '0 auto' }}>
         <Card.Body>
-          <h3>Sollet.io Wallet</h3>
-          <button onClick={importWallet.bind(null, false)} className="btn my-2">
-            Import Wallet using Sollet.io
-          </button>
-          <hr />
-          <h3>Private Key Wallet</h3>
-          Solana Fantasy Sports Wallet keeps your keys in your browser until you use this app and
-          they are erased from the browser if you closed the tab or even refreshed the page.
-          <Form.Control
-            className="align-items-center my-2"
-            onChange={(event) => setPrivateKeyInput(event.target.value)}
-            value={privateKeyInput}
-            type="text"
-            placeholder="Enter your wallet's private key"
-            autoComplete="off"
-            isInvalid={
-              privateKeyInput !== '' &&
-              (!isHexString(privateKeyInput) || privateKeyInput.length !== 130)
-            }
-          />
-          {display !== null ? (
-            <Alert className="my-2" variant={display.variant}>
-              {display.message}
-            </Alert>
-          ) : null}
-          {display?.variant !== 'success' ? (
+          {currentScreen === 0 ? (
             <>
+              <h3>Sollet.io Wallet</h3>
+              You can use an open-sourced wallet created by Serium team! This is like the Metamask
+              for Solana.
+              <br />
+              {display !== null && activeWallet === 'sollet' ? (
+                <Alert className="my-2" variant={display.variant}>
+                  {display.message}
+                </Alert>
+              ) : null}
+              <button onClick={importWallet.bind(null, false)} className="btn my-2">
+                Import Wallet using Sollet.io
+              </button>
+              <hr />
+              <h3>Private Key Wallet</h3>
+              Solana Fantasy Sports Wallet keeps your keys in your browser until you use this app
+              and they are erased from the browser if you closed the tab or even refreshed the page.
+              <Form.Control
+                className="align-items-center my-2"
+                onChange={(event) => setPrivateKeyInput(event.target.value)}
+                value={privateKeyInput}
+                type="text"
+                placeholder="Enter your wallet's private key"
+                autoComplete="off"
+                isInvalid={
+                  privateKeyInput !== '' &&
+                  (!isHexString(privateKeyInput) || privateKeyInput.length !== 130)
+                }
+              />
+              {display !== null && activeWallet === 'privatekey' ? (
+                <Alert className="my-2" variant={display.variant}>
+                  {display.message}
+                </Alert>
+              ) : null}
               <button onClick={importWallet.bind(null, true)} className="btn my-2">
                 Import Wallet using Private Key
               </button>
-              <span className="small mt-2 mb-0 display-block">
-                <Link to="/wallet/create">But I don't have a wallet.</Link>
+              <hr />
+              <span className="mt-2 mb-0 display-block">
+                <Link to="/wallet/create">I don't have a wallet.</Link>
               </span>
             </>
-          ) : (
-            <Link to="/wallet">
-              <span className="btn mb-2">Go to my wallet</span>
-            </Link>
-          )}
+          ) : currentScreen === 1 ? (
+            <>
+              {display !== null ? (
+                <Alert className="my-2" variant={display.variant}>
+                  {display.message}
+                </Alert>
+              ) : null}
+              <Link to="/wallet">
+                <span className="btn mb-2">Go to my wallet</span>
+              </Link>
+            </>
+          ) : null}
         </Card.Body>
       </Card>
     </Layout>
