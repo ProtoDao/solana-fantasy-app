@@ -7,6 +7,7 @@ import {
 } from '@solana/web3.js';
 import { arrayify, hexlify, isHexString } from '@ethersproject/bytes';
 import SolletWalletAdapter from '@project-serum/sol-wallet-adapter';
+import bs58 from 'bs58';
 
 export interface ClojuredWallet {
   publicKey: PublicKey;
@@ -91,8 +92,27 @@ export class SolletWallet implements ClojuredWallet {
   }
 
   async sendAndConfirmTx(description: string, transaction: Transaction) {
-    const signedTx = await this._wallet.signTransaction(transaction);
-    return await this._connection.sendTransaction(signedTx, []);
+    // console.log('_sendRequest');
+
+    transaction.recentBlockhash = (await this._connection.getRecentBlockhash('recent')).blockhash;
+    transaction.setSigners(this.publicKey);
+    transaction.feePayer = this.publicKey;
+
+    const response = await this._wallet._sendRequest('signTransaction', {
+      message: bs58.encode(transaction.serializeMessage()),
+    });
+
+    // console.log('_sendRequest response', response);
+
+    const signature = bs58.decode(response.signature);
+    const publicKey = new PublicKey(response.publicKey);
+    transaction.addSignature(publicKey, signature);
+
+    // console.log('123', transaction);
+
+    return await this._connection.sendRawTransaction(transaction.serialize(), {
+      preflightCommitment: 'recent',
+    });
   }
 }
 

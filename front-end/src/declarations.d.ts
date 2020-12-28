@@ -12,5 +12,6 @@ declare module '@project-serum/sol-wallet-adapter' {
     on: (type: 'connect', callback: (_publicKey: PublicKey) => void) => void;
     signTransaction: (transaction: Transaction) => Promise<Transaction>;
     signAllTransactions: (transactions: Transaction[]) => Promise<Transaction[]>;
+    _sendRequest: (method: string, params: any) => Promise<any>;
   }
 }

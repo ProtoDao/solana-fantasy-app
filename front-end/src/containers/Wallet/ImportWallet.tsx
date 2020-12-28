@@ -10,24 +10,19 @@ export const ImportWallet: FunctionComponent<{}> = (props) => {
   let [privateKeyInput, setPrivateKeyInput] = useState<string>('');
   let [display, setDisplay] = useState<{ message: string; variant: string } | null>(null);
 
-  const importWallet = () => {
+  const importWallet = async (isPrivateKey: boolean) => {
     try {
       setDisplay({
         message: 'Please wait importing wallet...',
         variant: 'warning',
       });
-      const wallet = new PrivateKeyWallet(privateKeyInput, window.connection);
+      const wallet = isPrivateKey
+        ? new PrivateKeyWallet(privateKeyInput, window.connection)
+        : new SolletWallet(window.connection);
       window.wallet = wallet;
-      // try {
-      //   window.wallet.callback(
-      //     'Wallet Imported! Do you want to locally cache your wallet?',
-      //     (acc) => {
-      //       try {
-      //         localStorage.setItem('sfs-secret', hexlify(acc.secretKey));
-      //       } catch {}
-      //     }
-      //   );
-      // } catch {}
+
+      await wallet.ready;
+
       setDisplay({
         message: 'Wallet imported successfully!',
         variant: 'success',
@@ -50,6 +45,12 @@ export const ImportWallet: FunctionComponent<{}> = (props) => {
     <Layout heading="Import Wallet">
       <Card style={{ maxWidth: '400px', margin: '0 auto' }}>
         <Card.Body>
+          <h3>Sollet.io Wallet</h3>
+          <button onClick={importWallet.bind(null, false)} className="btn my-2">
+            Import Wallet using Sollet.io
+          </button>
+          <hr />
+          <h3>Private Key Wallet</h3>
           Solana Fantasy Sports Wallet keeps your keys in your browser until you use this app and
           they are erased from the browser if you closed the tab or even refreshed the page.
           <Form.Control
@@ -71,8 +72,8 @@ export const ImportWallet: FunctionComponent<{}> = (props) => {
           ) : null}
           {display?.variant !== 'success' ? (
             <>
-              <button onClick={importWallet} className="btn my-2">
-                Import Wallet
+              <button onClick={importWallet.bind(null, true)} className="btn my-2">
+                Import Wallet using Private Key
               </button>
               <span className="small mt-2 mb-0 display-block">
                 <Link to="/wallet/create">But I don't have a wallet.</Link>
