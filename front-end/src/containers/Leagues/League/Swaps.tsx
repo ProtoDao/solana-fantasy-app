@@ -96,7 +96,7 @@ export const Swaps: FunctionComponent<RouteComponentProps<MatchParams>> = (props
     if (league === null) return;
 
     const index = league.userStates.findIndex((usr) => {
-      return !!window.wallet && window.wallet.publicKey === usr.pubKey.toBase58();
+      return !!window.wallet && window.wallet.publicKey.toBase58() === usr.pubKey.toBase58();
     });
 
     if (index !== -1) {
@@ -188,28 +188,17 @@ export const Swaps: FunctionComponent<RouteComponentProps<MatchParams>> = (props
       throw new Error('wantPlayer is null');
     }
 
-    const resp = await window.wallet.callback('Sign on Propose Swap transaction?', async (acc) => {
-      console.log(
-        leagueIndex,
-        selfTeamIndex + 1,
-        otherTeamIndex + 1,
-        // givePlayerInSelfUserPlayers,
-        // wantPlayerInOtherUserPlayers
-        givePlayer,
-        wantPlayer
-      );
+    const resp = await sdk.proposeSwap(
+      window.wallet,
+      leagueIndex,
+      selfTeamIndex + 1,
+      otherTeamIndex + 1,
+      // givePlayerInSelfUserPlayers,
+      // wantPlayerInOtherUserPlayers
+      givePlayer,
+      wantPlayer
+    );
 
-      return await sdk.proposeSwap(
-        acc,
-        leagueIndex,
-        selfTeamIndex + 1,
-        otherTeamIndex + 1,
-        // givePlayerInSelfUserPlayers,
-        // wantPlayerInOtherUserPlayers
-        givePlayer,
-        wantPlayer
-      );
-    });
     console.log({ resp });
   };
 
@@ -266,16 +255,15 @@ export const Swaps: FunctionComponent<RouteComponentProps<MatchParams>> = (props
       throw new Error('Wallet not loaded');
     }
     const sdk = await window.sfsSDK();
-    const resp = await window.wallet.callback('Sign on Accept Swap transaction?', async (acc) => {
-      return await sdk.acceptSwap(
-        acc,
-        leagueIndex,
-        acceptingUserId,
-        proposingUserId,
-        wantPlayerId,
-        givePlayerId
-      );
-    });
+    const resp = await sdk.acceptSwap(
+      window.wallet,
+      leagueIndex,
+      acceptingUserId,
+      proposingUserId,
+      wantPlayerId,
+      givePlayerId
+    );
+
     console.log({ resp });
   };
 
@@ -289,16 +277,14 @@ export const Swaps: FunctionComponent<RouteComponentProps<MatchParams>> = (props
       throw new Error('Wallet not loaded');
     }
     const sdk = await window.sfsSDK();
-    const resp = await window.wallet.callback('Sign on Reject Swap transaction?', async (acc) => {
-      return await sdk.rejectSwap(
-        acc,
-        leagueIndex,
-        acceptingUserId,
-        proposingUserId,
-        wantPlayerId,
-        givePlayerId
-      );
-    });
+    const resp = await sdk.rejectSwap(
+      window.wallet,
+      leagueIndex,
+      acceptingUserId,
+      proposingUserId,
+      wantPlayerId,
+      givePlayerId
+    );
     console.log({ resp });
   };
 

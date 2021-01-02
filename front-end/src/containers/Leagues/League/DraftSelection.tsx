@@ -135,7 +135,7 @@ export const DraftSelection: FunctionComponent<RouteComponentProps<MatchParams>>
     if (root === null) return;
 
     const index = root.leagues[leagueIndex].userStates.findIndex((usr) => {
-      return !!window.wallet && window.wallet.publicKey === usr.pubKey.toBase58();
+      return !!window.wallet && window.wallet.publicKey.toBase58() === usr.pubKey.toBase58();
     });
 
     if (index !== -1) {
@@ -217,9 +217,9 @@ export const DraftSelection: FunctionComponent<RouteComponentProps<MatchParams>>
     if (selfTeamIndex === null) {
       throw new Error('selfTeamIndex is null');
     }
-    const resp = await window.wallet.callback('Sign on Pick Player transaction?', async (acc) => {
-      await sdk.pickPlayer(acc, leagueIndex, selfTeamIndex + 1, playerId);
-    });
+    // const resp = await window.wallet.callback('Sign on Pick Player transaction?', async (acc) => {
+    // });
+    const resp = await sdk.pickPlayer(window.wallet, leagueIndex, selfTeamIndex + 1, playerId);
     console.log({ resp });
   };
 

@@ -3,7 +3,8 @@ import { Alert, Card, Form } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { Layout } from '../Layout';
 import { hexlify } from '@ethersproject/bytes';
-import { CreateClojuredWallet } from '../../clojured-wallet';
+import { randomBytes } from '@ethersproject/random';
+import { PrivateKeyWallet, SolletWallet } from '../../clojured-wallet';
 
 export const CreateWallet: FunctionComponent<{}> = (props) => {
   let [display, setDisplay] = useState<{ message: string; variant: string } | null>(null);
@@ -14,18 +15,19 @@ export const CreateWallet: FunctionComponent<{}> = (props) => {
         message: 'Please wait creating wallet...',
         variant: 'warning',
       });
-      const wallet = CreateClojuredWallet();
+      const randomKey = hexlify(randomBytes(64));
+      const wallet = new PrivateKeyWallet(randomKey, window.connection);
       window.wallet = wallet;
-      try {
-        window.wallet.callback(
-          'Wallet Created! Do you want to locally cache your wallet?',
-          (acc) => {
-            try {
-              localStorage.setItem('sfs-secret', hexlify(acc.secretKey));
-            } catch {}
-          }
-        );
-      } catch {}
+      // try {
+      //   window.wallet.callback(
+      //     'Wallet Created! Do you want to locally cache your wallet?',
+      //     (acc) => {
+      //       try {
+      //         localStorage.setItem('sfs-secret', hexlify(acc.secretKey));
+      //       } catch {}
+      //     }
+      //   );
+      // } catch {}
       setDisplay({
         message: 'Wallet create successfully!',
         variant: 'success',

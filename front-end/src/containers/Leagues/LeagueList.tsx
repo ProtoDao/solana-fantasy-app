@@ -59,7 +59,9 @@ export const LeagueRow: FunctionComponent<{ league: League; leagueIndex: number 
   useEffect(() => {
     (async () => {
       if (window.wallet) {
-        setIsAlreadyJoined(await isUserAlreadyJoined(window.wallet.publicKey, props.leagueIndex));
+        setIsAlreadyJoined(
+          await isUserAlreadyJoined(window.wallet.publicKey.toBase58(), props.leagueIndex)
+        );
       }
     })().catch(console.error);
   }, []);
@@ -68,7 +70,13 @@ export const LeagueRow: FunctionComponent<{ league: League; leagueIndex: number 
     <tr>
       <td>{props.leagueIndex}</td>
       <td>{props.league.name || 'No Name'}</td>
-      <td>{props.league.bid.toNumber() / 10 ** 9} SOL</td>
+      <td>
+        {
+          // @ts-ignore
+          props.league.bid.toNumber() / 10 ** 9
+        }{' '}
+        SOL
+      </td>
       <td>
         {props.league.userStateCount}/{props.league.usersLimit}
       </td>

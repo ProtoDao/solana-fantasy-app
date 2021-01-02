@@ -90,7 +90,7 @@ export const Lineups: FunctionComponent<RouteComponentProps<MatchParams>> = (pro
     if (league === null) return;
 
     const index = league.userStates.findIndex((usr) => {
-      return !!window.wallet && window.wallet.publicKey === usr.pubKey.toBase58();
+      return !!window.wallet && window.wallet.publicKey.toBase58() === usr.pubKey.toBase58();
     });
 
     if (index !== -1) {
@@ -170,11 +170,14 @@ export const Lineups: FunctionComponent<RouteComponentProps<MatchParams>> = (pro
     if (selfTeamIndex === null) {
       throw new Error('selfTeamIndex is null');
     }
-    const resp = await window.wallet.callback('Sign on Update Lineup transaction?', async (acc) => {
-      console.log({ newLineup }, root.currentWeek + 1);
+    const resp = await sdk.updateLineup(
+      window.wallet,
+      leagueIndex,
+      selfTeamIndex + 1,
+      root.currentWeek + 1,
+      newLineup
+    );
 
-      await sdk.updateLineup(acc, leagueIndex, selfTeamIndex + 1, root.currentWeek + 1, newLineup);
-    });
     console.log({ resp });
   };
 
